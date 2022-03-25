@@ -17,6 +17,7 @@ module JumpBranchControl(
 	Comparator_32bit Comparator(
 			.m		(i_CompareSrc1_32	),
 			.n		(i_CompareSrc2_32	),
+			.equal	( 1'b1				),
 			.result	(GreaterOrEqual		)
 	);
 

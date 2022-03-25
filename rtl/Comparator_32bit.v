@@ -13,12 +13,12 @@
 module Comparator_32bit( 
 						input [31:0] m,
 						input [31:0] n,
+						input  equal,
 						output result
 										);
 
    wire[31:0] s_temp;
    wire[31:0] out;
-   wire equal = 1'b1;
    
    assign s_temp[31] = m[31]^n[31];
    assign s_temp[30] = m[30]^n[30];
