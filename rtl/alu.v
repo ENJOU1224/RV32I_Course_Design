@@ -10,8 +10,6 @@
 */
 module alu(
 	input  [31:0]	PC,
-	input  [31:0]	Inst,
-
 
 	// 来自DECODE部分的信号					(Signals from DECODE Part)	
 	input  [11:0]	i_ALUControl_12,
@@ -55,13 +53,14 @@ module alu(
 	assign AdderOperand2	= {32{ SUB}} & ~i_ALUOperand2_32
 							| {32{~SUB}} &  i_ALUOperand2_32;
 	
-	Adder Adder(
-			.i_AdderOperand1_32		(i_ALUOperand1_32	),
-			.i_AdderOperand2_32		(AdderOperand2		),
-			.i_AdderCarryIn_1		(SUB				),
-			.o_AdderResult_32		(AddSubResult		),
-			.o_adderCarryOut_1		(					)
-	);
+	assign AddSubResult		= i_ALUOperand1_32 + AdderOperand2 +SUB;
+	// Adder Adder(
+	//         .i_AdderOperand1_32		(i_ALUOperand1_32	),
+	//         .i_AdderOperand2_32		(AdderOperand2		),
+	//         .i_AdderCarryIn_1		(SUB				),
+	//         .o_AdderResult_32		(AddSubResult		),
+	//         .o_adderCarryOut_1		(					)
+	// );
 
 	// PC+4
 	wire [31:0]	PC4Result;

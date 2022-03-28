@@ -30,11 +30,14 @@ module decode (
 	// 输出到Memory部分					(Output to Memory Part)
 	output			o_Load_1,
 	output			o_Store_1,
-	output			o_LoadSign_1,
+	output			o_LoadUnsigned_1,
 	output	[ 1:0]	o_LoadStoreWidth_2,
+	output  [31:0]	o_StoreData_32,
 
 	// 输出到JumpBranchControl部分		(Output to JumpBranchControl Part)
 	output	[ 7:0]	o_JumpBranchType_8,
+	output	[31:0]	o_CompareSrc1_32,
+	output	[31:0]	o_CompareSrc2_32,
 	output			o_UnsignedCMP_1
 );
 
@@ -184,9 +187,9 @@ module decode (
 
     assign I_Type   = Inst_ADDI |Inst_SLTI  |Inst_SLTIU |Inst_ANDI
                     | Inst_ORI  |Inst_XORI  |Inst_SLLI  |Inst_SRLI
-                    | Inst_SRAI |Inst_LUI   |Inst_AUIPC |Inst_LW
-                    | Inst_LH   |Inst_LB    |Inst_LHU   |Inst_LBU
-                    | Inst_ECALL|Inst_EBREAK|Inst_JALR	;
+                    | Inst_SRAI |Inst_LW	| Inst_LH   |Inst_LB    
+					|Inst_LHU   |Inst_LBU	| Inst_ECALL|Inst_EBREAK
+					|Inst_JALR	;
 
     assign R_Type   = Inst_ADD  |Inst_SLT   |Inst_SLTU  |Inst_AND
                     | Inst_OR   |Inst_XOR   |Inst_SLL   |Inst_SRL
@@ -240,32 +243,21 @@ module decode (
 
 	assign WithRS2	= R_Type	;
 
-	assign WithImm	= I_Type|S_Type	|U_Type	|J_Type	;
+	assign WithImm	= I_Type|S_Type	|U_Type	|J_Type	|B_Type;
 	
     //----------根据指令的访存类型分类(Classification according to the type of Load Store operation)----------//
 	wire [1:0]	LoadStoreWidth;		// 读写长度
 	wire		Load;				// 读取指令
 	wire		Store;				// 写指令
-	wire		LoadSign;			// 读取符号补全方式
-	wire		ByteWidth;			// 字节长度
-	wire		HalfWordWidth;		// 半字长
-	wire		WordWidth;			// 字节长度
+	wire		LoadUnsigned;			// 读取符号补全方式
 
 	assign Load			= Inst_LB	|Inst_LH	|Inst_LW	|Inst_LBU	|Inst_LHU;
 
 	assign Store		= Inst_SB	|Inst_SH	|Inst_SW	;
 
-	assign LoadSign		= Inst_LB	|Inst_LH	;
+	assign LoadUnsigned		= Inst[14];					// 指令该位区分了无符号读
 
-	assign ByteWidth	= Inst_LB	|Inst_LBU	|Inst_SB	;
-
-	assign HalfWordWidth= Inst_LH	|Inst_LHU	|Inst_SH	;
-
-	assign WordWidth	= Inst_LW	|Inst_SW	;
-
-	assign LoadStoreWidth	= {{2{ByteWidth		}}	& 2'b00}
-							| {{2{HalfWordWidth	}}	& 2'b01}
-							| {{2{WordWidth		}}	& 2'b11};
+	assign LoadStoreWidth	= Inst[13:12];				// 指令的这两位区分了store宽度
 
 	//----------根据跳转比较符号情况分类(Classification according to the jump comparison symbol case)
 	wire UnsignedCMP;	
@@ -275,7 +267,7 @@ module decode (
     //----------特殊操作数(Special Operand1PC)----------//
 	wire Operand1PC;		// 源操作数1为PC
 
-	assign Operand1PC	= J_Type	|Inst_AUIPC	;
+	assign Operand1PC	= J_Type	|B_Type		|Inst_AUIPC	;
 
 //------------------------------指令译码(Instruction Decode){end}------------------------------//
 	
@@ -349,7 +341,7 @@ module decode (
 
 	assign o_ALUControl_12	= ALUControl;
 
-	assign o_LoadSign_1		= LoadSign;
+	assign o_LoadUnsigned_1	= LoadUnsigned;
 
 	assign o_LoadStoreWidth_2	= LoadStoreWidth;
 
@@ -360,4 +352,10 @@ module decode (
 	assign o_JumpBranchType_8	= JumpBranchType;
 
 	assign o_UnsignedCMP_1	= UnsignedCMP;
+	
+	assign o_CompareSrc1_32	= i_GRFReadData1_32;
+	
+	assign o_CompareSrc2_32	= i_GRFReadData2_32;
+
+	assign o_StoreData_32	= i_GRFReadData2_32;
 endmodule

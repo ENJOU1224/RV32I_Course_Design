@@ -11,6 +11,7 @@ module regfile (
 
     // 时钟复位信号     (Clock and Reset)
     input               clk,
+	input				rstn,
 
     // 写端口           (Write Port)
     input               i_wen,
@@ -23,11 +24,18 @@ module regfile (
     output      [31:0]  o_rdata1_32,
     output      [31:0]  o_rdata2_32
 );
-
+	integer i;
     reg [31:0] rf[31:0];
-    always @(posedge clk) begin
+    always @(posedge clk or negedge rstn) begin
+		if(!rstn)begin
+				for (i = 0; i < 32; i=i+1) begin
+					rf[i] <= 32'b0;	
+				end
+		end else begin
         rf[i_waddr_5]	<= {32{ i_wen}}	& i_wdata_32	
 						|  {32{~i_wen}}	& rf[i_waddr_5] ;
+		rf[0]			<= 32'b0;
+				end
     end
 
     // 读端口1
