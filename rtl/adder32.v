@@ -5,12 +5,12 @@ module Adder (
 		output[31:0] o_adderSum_32,
 		output		 o_cOut_1
 );
-	wire [7:0][3:0] w_0inTempSum_4;
-	wire [7:0][3:0] w_1inTempSum_4;
-	reg  [7:0][3:0] w_tempSum_4;
-	reg  [7:0]		w_0inCIn_8;
-	reg  [7:0]		w_1inCIn_8;
-	reg  [7:0]		w_cIn_8;
+	wire [3:0]	w_0inTempSum_4[7:0];
+	wire [3:0]	w_1inTempSum_4[7:0];
+	reg  [3:0]	w_tempSum_4[7:0];
+	wire [7:0]	w_0inCIn_8;
+	wire [7:0]	w_1inCIn_8;
+	reg  [7:0]	w_cIn_8;
 
 	genvar i;
 	generate
@@ -20,14 +20,14 @@ module Adder (
 							.i_adderOperand1_4 	(i_adderOperand1_32[3+4*i:4*i] 	),
 							.i_adderOperand2_4 	(i_adderOperand2_32[3+4*i:4*i] 	),
 							.o_cOut_1      		(w_0inCIn_8[i]					),
-							.o_adderSum_8 		(w_0inTempSum_4[i] 				)
+							.o_adderResult_4 	(w_0inTempSum_4[i] 				)
 					);
 					m_adder4 m_in1Adder4(
 							.i_cIn_1 			(1'b1 							),
 							.i_adderOperand1_4 	(i_adderOperand1_32[3+4*i:4*i] 	),
 							.i_adderOperand2_4 	(i_adderOperand2_32[3+4*i:4*i] 	),
 							.o_cOut_1      		(w_1inCIn_8[i]					),
-							.o_adderSum_8      	(w_1inTempSum_4[i] 				)
+							.o_adderResult_4    (w_1inTempSum_4[i] 				)
 					);
 			end
 	endgenerate

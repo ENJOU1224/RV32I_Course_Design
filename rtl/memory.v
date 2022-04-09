@@ -15,7 +15,6 @@ module memory(
 	
 	// 输出到内存的信号					(Signals output to memory)
 	output[31:0]	o_MemoryStoreData_32,
-	output[31:0]	o_MemoryAddr_32,
 	output			o_MemoryWriteEnable_1,
 
 	// 输出到WB部分的信号				(Signals output to WB)
@@ -39,37 +38,35 @@ assign LW = i_Load_1 & i_LoadStoreWidth_2[1];
 assign LH = i_Load_1 & i_LoadStoreWidth_2[0];
 assign LB = i_Load_1 & ~|i_LoadStoreWidth_2;
 
-assign SHData				= {32{ i_ALUResult_32[1]}}	& {i_StoreData_32[15:0]			,i_MemoryLoadData_32[15:0]	}
-							| {32{~i_ALUResult_32[1]}}	& {i_MemoryLoadData_32[31:16]	,i_StoreData_32[15:0]		};
+assign SHData				= {32{ i_ALUResult_32[1]}}	& {i_StoreData_32[15:0]				,i_MemoryLoadData_32[15:0]}
+										| {32{~i_ALUResult_32[1]}}	& {i_MemoryLoadData_32[31:16]	,i_StoreData_32[15:0]			};
 
-assign SBData				= {32{~|i_ALUResult_32[1:0]					}}	& {i_MemoryLoadData_32[31: 8]	,i_StoreData_32[ 7: 0]								}
-							| {32{~i_ALUResult_32[1]& i_ALUResult_32[0] }}	& {i_MemoryLoadData_32[31:16]	,i_StoreData_32[15: 8]	,i_MemoryLoadData_32[ 7: 0]	}
-							| {32{ i_ALUResult_32[1]&~i_ALUResult_32[0] }}	& {i_MemoryLoadData_32[31:24]	,i_StoreData_32[23:16]	,i_MemoryLoadData_32[15: 0]	}
-							| {32{&i_ALUResult_32[1:0]					}}	& {								 i_StoreData_32[31:24]	,i_MemoryLoadData_32[23: 0]	};
+assign SBData				= {32{~|i_ALUResult_32[1:0]						}}	& {i_MemoryLoadData_32[31: 8]	,i_StoreData_32[ 7: 0]															}
+										| {32{~i_ALUResult_32[1]& i_ALUResult_32[0] }}	& {i_MemoryLoadData_32[31:16]	,i_StoreData_32[15: 8]	,i_MemoryLoadData_32[ 7: 0]	}
+										| {32{ i_ALUResult_32[1]&~i_ALUResult_32[0] }}	& {i_MemoryLoadData_32[31:24]	,i_StoreData_32[23:16]	,i_MemoryLoadData_32[15: 0]	}
+										| {32{&i_ALUResult_32[1:0]									}}	& {															i_StoreData_32[31:24]	,i_MemoryLoadData_32[23: 0]	};
 
 assign LHData				= {32{ i_ALUResult_32[1]}}	& {{16{~i_LoadUnsigned_1&i_MemoryLoadData_32[15]}}	,i_MemoryLoadData_32[15: 0]	}
-							| {32{~i_ALUResult_32[1]}}	& {{16{~i_LoadUnsigned_1&i_MemoryLoadData_32[31]}}	,i_MemoryLoadData_32[31:16]	};
+										| {32{~i_ALUResult_32[1]}}	& {{16{~i_LoadUnsigned_1&i_MemoryLoadData_32[31]}}	,i_MemoryLoadData_32[31:16]	};
 
 
 assign LBData				= {32{~|i_ALUResult_32[1:0]					}}	& {{24{~i_LoadUnsigned_1&i_MemoryLoadData_32[ 7]}}	,i_MemoryLoadData_32[ 7: 0]	}
-							| {32{~i_ALUResult_32[1]& i_ALUResult_32[0] }}	& {{24{~i_LoadUnsigned_1&i_MemoryLoadData_32[15]}}	,i_MemoryLoadData_32[15: 8]	}
-							| {32{ i_ALUResult_32[1]&~i_ALUResult_32[0] }}	& {{24{~i_LoadUnsigned_1&i_MemoryLoadData_32[23]}}	,i_MemoryLoadData_32[23:16]	}
-							| {32{&i_ALUResult_32[1:0]					}}	& {{24{~i_LoadUnsigned_1&i_MemoryLoadData_32[31]}}	,i_MemoryLoadData_32[31:24]	};
+										| {32{~i_ALUResult_32[1]& i_ALUResult_32[0] }}	& {{24{~i_LoadUnsigned_1&i_MemoryLoadData_32[15]}}	,i_MemoryLoadData_32[15: 8]	}
+										| {32{ i_ALUResult_32[1]&~i_ALUResult_32[0] }}	& {{24{~i_LoadUnsigned_1&i_MemoryLoadData_32[23]}}	,i_MemoryLoadData_32[23:16]	}
+										| {32{&i_ALUResult_32[1:0]					}}	& {{24{~i_LoadUnsigned_1&i_MemoryLoadData_32[31]}}	,i_MemoryLoadData_32[31:24]	};
 
 assign DataWriteToMem		= {32{SW}}	& i_StoreData_32
-							| {32{SH}}	& SHData
-							| {32{SB}}	& SBData		;
+												| {32{SH}}	& SHData
+												| {32{SB}}	& SBData		;
 
 assign LoadData				= {32{LW}}	& i_MemoryLoadData_32
-							| {32{LH}}	& LHData
-							| {32{LB}}	& LBData		;
+											| {32{LH}}	& LHData
+											| {32{LB}}	& LBData		;
 
 assign DataWriteToGRF		= {32{ i_Load_1	}} & LoadData
-							| {32{~i_Load_1 }} & i_ALUResult_32		;	
+												| {32{~i_Load_1 }} & i_ALUResult_32		;	
 
 assign o_MemoryStoreData_32 = DataWriteToMem;
-
-assign o_MemoryAddr_32		= i_ALUResult_32	& 32'HFFFFFFFC;
 
 assign o_MemoryWriteEnable_1= i_Store_1;
 

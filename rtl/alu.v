@@ -53,14 +53,14 @@ module alu(
 	assign AdderOperand2	= {32{ SUB}} & ~i_ALUOperand2_32
 							| {32{~SUB}} &  i_ALUOperand2_32;
 	
-	assign AddSubResult		= i_ALUOperand1_32 + AdderOperand2 +SUB;
-	// Adder Adder(
-	//         .i_AdderOperand1_32		(i_ALUOperand1_32	),
-	//         .i_AdderOperand2_32		(AdderOperand2		),
-	//         .i_AdderCarryIn_1		(SUB				),
-	//         .o_AdderResult_32		(AddSubResult		),
-	//         .o_adderCarryOut_1		(					)
-	// );
+	// assign AddSubResult		= i_ALUOperand1_32 + AdderOperand2 +SUB;
+	 Adder Adder(
+	         .i_adderOperand1_32		(i_ALUOperand1_32	),
+	         .i_adderOperand2_32		(AdderOperand2		),
+	         .i_cIn_1			        (SUB				),
+	         .o_adderSum_32			    (AddSubResult		),
+	         .o_cOut_1			        (			        )
+	 );
 
 	// PC+4
 	wire [31:0]	PC4Result;
@@ -127,7 +127,7 @@ module alu(
 	// SRA
 	wire [31:0] SRAResult;
 
-	assign SRAResult	= i_ALUOperand1_32 >>> i_ALUOperand2_32;
+	assign SRAResult	= ($signed(i_ALUOperand1_32)) >>> i_ALUOperand2_32;
 
 	// LUI
 	wire [31:0] LUIResult;
@@ -137,17 +137,17 @@ module alu(
 //--------------------输出信号生成(Output Signals Generation)--------------------//
 
 	assign o_ALUResult_32	= {32{ADD }}	& AddSubResult
-							| {32{SUB }}	& AddSubResult
-							| {32{PC4 }}	& PC4Result
-							| {32{SLT }}	& SLTResult
-							| {32{SLTU}}	& SLTUResult
-							| {32{AND }}	& ANDResult
-							| {32{OR  }}	& ORResult
-							| {32{XOR }}	& XORResult
-							| {32{SLL }}	& SLLResult
-							| {32{SRL }}	& SRLResult
-							| {32{SRA }}	& SRAResult
-							| {32{LUI }}	& LUIResult;
+												| {32{SUB }}	& AddSubResult
+												| {32{PC4 }}	& PC4Result
+												| {32{SLT }}	& SLTResult
+												| {32{SLTU}}	& SLTUResult
+												| {32{AND }}	& ANDResult
+												| {32{OR  }}	& ORResult
+												| {32{XOR }}	& XORResult
+												| {32{SLL }}	& SLLResult
+												| {32{SRL }}	& SRLResult
+												| {32{SRA }}	& SRAResult
+												| {32{LUI }}	& LUIResult;
 
 	assign o_JumpBranchAddr_32	= AddSubResult;
 

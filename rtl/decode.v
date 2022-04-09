@@ -20,7 +20,7 @@ module decode (
     input   [31:0]  i_GRFReadData2_32,
 
 	output	[ 4:0]	o_GRFWriteAddr_5,
-	output			o_GRFWen_1,
+	output					o_GRFWen_1,
 
 	// 输出到EX部分						(Output to EX Part)
 	output	[11:0]	o_ALUControl_12,
@@ -50,11 +50,11 @@ module decode (
     wire [ 4:0] rs1;
     wire [ 4:0] rd;
     wire [ 6:0] opcode;
-	wire [19:0] imm20;
+		wire [19:0] imm20;
     wire [11:0] imm12;
-	wire [11:0] imm12_B;
-	wire [ 6:0] imm7;
-	wire [ 4:0] imm5;
+		wire [11:0] imm12_B;
+		wire [ 6:0] imm7;
+		wire [ 4:0] imm5;
     wire [19:0] U_imm;
 
     assign funct7   = Inst[31:25];
@@ -64,12 +64,12 @@ module decode (
     assign rs1      = Inst[19:15];
     assign rd       = Inst[11: 7];
     assign opcode   = Inst[ 6: 0];
-	assign imm20	= {Inst[31],Inst[19:12],Inst[20],Inst[30:21]};
-	assign imm12	= Inst[31:20];
-	assign imm12_B	= {Inst[31],Inst[7],Inst[30:25],Inst[11:8]};
-	assign imm7		= Inst[31:25];
-	assign imm5		= Inst[11: 7];
-	assign U_imm	= Inst[31:12];
+		assign imm20	= {Inst[31],Inst[19:12],Inst[20],Inst[30:21]};
+		assign imm12	= Inst[31:20];
+		assign imm12_B	= {Inst[31],Inst[7],Inst[30:25],Inst[11:8]};
+		assign imm7		= Inst[31:25];
+		assign imm5		= Inst[11: 7];
+		assign U_imm	= Inst[31:12];
 
 //------------------------------指令区域划分(Instruction Subfield Division){begin}------------------------------//
 
@@ -147,12 +147,12 @@ module decode (
     assign Inst_JALR    = {{funct3 == `FUNCT3_JALR  } & {opcode == `OPCODE_JALR     }};
 
     // 条件分支                                             (Conditional Branches)
-    assign Inst_BEQ     = {{funct3 == `FUNCT3_BEQ   } & {opcode == `OPCODE_BRANCH   }};
-	assign Inst_BNE		= {{funct3 == `FUNCT3_BNE	} & {opcode == `OPCODE_BRANCH	}};
-	assign Inst_BLT		= {{funct3 == `FUNCT3_BLT	} & {opcode == `OPCODE_BRANCH	}};
-	assign Inst_BLTU	= {{funct3 == `FUNCT3_BLTU	} & {opcode == `OPCODE_BRANCH	}};
-	assign Inst_BGE		= {{funct3 == `FUNCT3_BGE	} & {opcode == `OPCODE_BRANCH	}};
-	assign Inst_BGEU	= {{funct3 == `FUNCT3_BGEU	} & {opcode == `OPCODE_BRANCH	}};
+    assign Inst_BEQ     = {{funct3 == `FUNCT3_BEQ   } & {opcode == `OPCODE_BRANCH }};
+		assign Inst_BNE			= {{funct3 == `FUNCT3_BNE		}	& {opcode == `OPCODE_BRANCH	}};
+		assign Inst_BLT			= {{funct3 == `FUNCT3_BLT		}	& {opcode == `OPCODE_BRANCH	}};
+		assign Inst_BLTU		= {{funct3 == `FUNCT3_BLTU	} & {opcode == `OPCODE_BRANCH	}};
+		assign Inst_BGE			= {{funct3 == `FUNCT3_BGE		}	& {opcode == `OPCODE_BRANCH	}};
+		assign Inst_BGEU		= {{funct3 == `FUNCT3_BGEU	} & {opcode == `OPCODE_BRANCH	}};
 
 	//----------读写指令(Load and Store Instructions)----------//
     assign Inst_LB      = {{funct3 == `FUNCT3_LB    } & {opcode == `OPCODE_LOAD     }};
@@ -187,9 +187,9 @@ module decode (
 
     assign I_Type   = Inst_ADDI |Inst_SLTI  |Inst_SLTIU |Inst_ANDI
                     | Inst_ORI  |Inst_XORI  |Inst_SLLI  |Inst_SRLI
-                    | Inst_SRAI |Inst_LW	| Inst_LH   |Inst_LB    
-					|Inst_LHU   |Inst_LBU	| Inst_ECALL|Inst_EBREAK
-					|Inst_JALR	;
+                    | Inst_SRAI |Inst_LW		| Inst_LH   |Inst_LB    
+										|Inst_LHU   |Inst_LBU		| Inst_ECALL|Inst_EBREAK
+										|Inst_JALR	;
 
     assign R_Type   = Inst_ADD  |Inst_SLT   |Inst_SLTU  |Inst_AND
                     | Inst_OR   |Inst_XOR   |Inst_SLL   |Inst_SRL
@@ -202,19 +202,18 @@ module decode (
 
     assign S_Type   = Inst_SW   |Inst_SH    |Inst_SB    ;
 
-	assign U_Type	= Inst_LUI	|Inst_AUIPC	;
+		assign U_Type		= Inst_LUI	|Inst_AUIPC	;
 
 
     //----------根据ALU操作类型分类(Classification according to the type of ALU operation)----------//
-	wire	ADD	, SUB	, SLT	, SLTU	,
-			AND , OR	, XOR	, SLL	,
-			SRL , SRA	, LUI	, PC4	;
+		wire	ADD	, SUB	, SLT	, SLTU	,
+					AND , OR	, XOR	, SLL	,
+					SRL , SRA	, LUI	, PC4	;
 
 	assign ADD	= Inst_ADDI	|Inst_ADD	|Inst_LB 
-				| Inst_LH	|Inst_LW	|Inst_LBU
-				| Inst_LHU	|Inst_SB	|Inst_SH
-				| Inst_SW	|Inst_AUIPC	|Inst_JAL
-				| Inst_JALR	;
+							| Inst_LH		|Inst_LW	|Inst_LBU
+							| Inst_LHU	|Inst_SB	|Inst_SH
+							| Inst_SW		|Inst_AUIPC	;
 
 	assign PC4	= Inst_JAL	|Inst_JALR	;
 
@@ -226,7 +225,7 @@ module decode (
 
 	assign AND	= Inst_AND	|Inst_ANDI	;
 
-	assign OR	= Inst_OR	|Inst_ORI	;
+	assign OR		= Inst_OR	|Inst_ORI	;
 							
 	assign XOR	= Inst_XOR	|Inst_XORI	;
 
@@ -247,9 +246,9 @@ module decode (
 	
     //----------根据指令的访存类型分类(Classification according to the type of Load Store operation)----------//
 	wire [1:0]	LoadStoreWidth;		// 读写长度
-	wire		Load;				// 读取指令
-	wire		Store;				// 写指令
-	wire		LoadUnsigned;			// 读取符号补全方式
+	wire				Load;							// 读取指令
+	wire				Store;						// 写指令
+	wire				LoadUnsigned;			// 读取符号补全方式
 
 	assign Load			= Inst_LB	|Inst_LH	|Inst_LW	|Inst_LBU	|Inst_LHU;
 
@@ -275,23 +274,24 @@ module decode (
 //------------------------------输出信号生成(Output signal generation){end}------------------------------//
 	
 	// 输出信号定义
-	wire [31:0] imm_32;			// 输出立即数操作数
+	wire [31:0] imm_32;				// 输出立即数操作数
 	wire [11:0] ALUControl;		// ALU控制（独热码）
 	wire [31:0] ALUOperand1;	// ALU操作数1
 	wire [31:0] ALUOperand2;	// ALU操作数2
-	wire		GRF_Wen;		// 通用寄存器写使能
+	wire				GRF_Wen;				// 通用寄存器写使能
 	wire [ 7:0] JumpBranchType;	// 跳转分支类型 
 
 	// 输出信号逻辑生成								
-	assign imm_32		= {{32{ I_Type	}}	& {{20{imm12[11]}}	, imm12				}}
-						| {{32{ S_Type	}}	& {{20{imm7[6]	}}	, imm7		,imm5	}}
-						| {{32{ U_Type	}}	& { U_imm , 12'd0						}}
-						| {{32{ B_Type	}}	& {{19{imm12_B[11]}}, imm12_B	,1'b0	}}
-						| {{32{ J_Type	}}	& {{11{imm20[19]}}	, imm20		,1'b0	}};
+	assign imm_32		= {{32{ I_Type	}}	& {{20{imm12[11]}}	, imm12					} & {1'b1,~Inst_SRAI,30'b1}}
+									| {{32{ S_Type	}}	& {{20{imm7[6]	}}	, imm7		,imm5	}}
+									| {{32{ U_Type	}}	& { U_imm , 12'd0										}}
+									| {{32{ B_Type	}}	& {{19{imm12_B[11]}}, imm12_B	,1'b0	}}
+									| {{32{ J_Type	}}	& {{11{imm20[19]}}	, imm20		,1'b0	}};
 
-	assign GRF_Wen		= R_Type	|U_Type		|J_Type		|Inst_ADDI
-						| Inst_SLTI	|Inst_SLTIU |Inst_XORI	|Inst_ORI
-						| Inst_ANDI |Inst_SLLI	|Inst_SRLI	|Inst_SRAI ;
+	assign GRF_Wen	= R_Type		|U_Type			|J_Type			|Inst_ADDI
+									| Inst_SLTI	|Inst_SLTIU |Inst_XORI	|Inst_ORI
+									| Inst_ANDI |Inst_SLLI	|Inst_SRLI	|Inst_SRAI 
+									| Inst_JALR	;
 
 	assign ALUControl	= {
 							ADD	,
@@ -309,7 +309,7 @@ module decode (
 								};
 
 	assign ALUOperand1	= {{32{ Operand1PC	}}	& PC				}
-						| {{32{~Operand1PC	}}	& i_GRFReadData1_32	};
+											| {{32{~Operand1PC	}}	& i_GRFReadData1_32	};
 														
 	assign ALUOperand2	= {{32{ WithRS2		}}	& i_GRFReadData2_32	}
 						| {{32{ WithImm		}}	& imm_32			};

@@ -1,23 +1,13 @@
-//-----------------------------------------------
-//    module name: 
-//    author: Wei Ren
-//  
-//    version: 1st version (2021-10-01)
-//    description: 
-//        
-//
-//
-//-----------------------------------------------
 `timescale 1ns / 1ps
 
 module Comparator_32bit( 
 						input [31:0] m,
 						input [31:0] n,
-						input  equal,
 						output result
 										);
 
    wire[31:0] s_temp;
+   wire       equal = 1'b1;
    wire[31:0] out;
    
    assign s_temp[31] = m[31]^n[31];
