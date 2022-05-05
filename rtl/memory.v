@@ -39,15 +39,15 @@ assign LH = i_Load_1 & i_LoadStoreWidth_2[0];
 assign LB = i_Load_1 & ~|i_LoadStoreWidth_2;
 
 assign SHData				= {32{ i_ALUResult_32[1]}}	& {i_StoreData_32[15:0]				,i_MemoryLoadData_32[15:0]}
-										| {32{~i_ALUResult_32[1]}}	& {i_MemoryLoadData_32[31:16]	,i_StoreData_32[15:0]			};
+										| {32{~i_ALUResult_32[1]}}	& {i_MemoryLoadData_32[15:0]	,i_StoreData_32[15:0]			};
 
-assign SBData				= {32{~|i_ALUResult_32[1:0]						}}	& {i_MemoryLoadData_32[31: 8]	,i_StoreData_32[ 7: 0]															}
-										| {32{~i_ALUResult_32[1]& i_ALUResult_32[0] }}	& {i_MemoryLoadData_32[31:16]	,i_StoreData_32[15: 8]	,i_MemoryLoadData_32[ 7: 0]	}
-										| {32{ i_ALUResult_32[1]&~i_ALUResult_32[0] }}	& {i_MemoryLoadData_32[31:24]	,i_StoreData_32[23:16]	,i_MemoryLoadData_32[15: 0]	}
-										| {32{&i_ALUResult_32[1:0]									}}	& {															i_StoreData_32[31:24]	,i_MemoryLoadData_32[23: 0]	};
+assign SBData				= {32{~|i_ALUResult_32[1:0]									}}	& {i_MemoryLoadData_32[31: 8]	,i_StoreData_32[ 7: 0]															}
+										| {32{~i_ALUResult_32[1]& i_ALUResult_32[0] }}	& {i_MemoryLoadData_32[31:16]	,i_StoreData_32[ 7: 0]	,i_MemoryLoadData_32[ 7: 0]	}
+										| {32{ i_ALUResult_32[1]&~i_ALUResult_32[0] }}	& {i_MemoryLoadData_32[31:24]	,i_StoreData_32[ 7: 0]	,i_MemoryLoadData_32[15: 0]	}
+										| {32{&i_ALUResult_32[1:0]									}}	& {														 i_StoreData_32[ 7: 0]	,i_MemoryLoadData_32[23: 0]	};
 
-assign LHData				= {32{ i_ALUResult_32[1]}}	& {{16{~i_LoadUnsigned_1&i_MemoryLoadData_32[15]}}	,i_MemoryLoadData_32[15: 0]	}
-										| {32{~i_ALUResult_32[1]}}	& {{16{~i_LoadUnsigned_1&i_MemoryLoadData_32[31]}}	,i_MemoryLoadData_32[31:16]	};
+assign LHData				= {32{~i_ALUResult_32[1]}}	& {{16{~i_LoadUnsigned_1&i_MemoryLoadData_32[15]}}	,i_MemoryLoadData_32[15: 0]	}
+										| {32{ i_ALUResult_32[1]}}	& {{16{~i_LoadUnsigned_1&i_MemoryLoadData_32[31]}}	,i_MemoryLoadData_32[31:16]	};
 
 
 assign LBData				= {32{~|i_ALUResult_32[1:0]					}}	& {{24{~i_LoadUnsigned_1&i_MemoryLoadData_32[ 7]}}	,i_MemoryLoadData_32[ 7: 0]	}

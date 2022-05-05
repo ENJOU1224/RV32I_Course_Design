@@ -188,8 +188,8 @@ module decode (
     assign I_Type   = Inst_ADDI |Inst_SLTI  |Inst_SLTIU |Inst_ANDI
                     | Inst_ORI  |Inst_XORI  |Inst_SLLI  |Inst_SRLI
                     | Inst_SRAI |Inst_LW		| Inst_LH   |Inst_LB    
-										|Inst_LHU   |Inst_LBU		| Inst_ECALL|Inst_EBREAK
-										|Inst_JALR	;
+										| Inst_LHU  |Inst_LBU		| Inst_ECALL|Inst_EBREAK
+										| Inst_JALR	;
 
     assign R_Type   = Inst_ADD  |Inst_SLT   |Inst_SLTU  |Inst_AND
                     | Inst_OR   |Inst_XOR   |Inst_SLL   |Inst_SRL
@@ -282,16 +282,13 @@ module decode (
 	wire [ 7:0] JumpBranchType;	// 跳转分支类型 
 
 	// 输出信号逻辑生成								
-	assign imm_32		= {{32{ I_Type	}}	& {{20{imm12[11]}}	, imm12					} & {1'b1,~Inst_SRAI,30'b1}}
+	assign imm_32		= {{32{ I_Type	}}	& {{20{imm12[11]}}	, imm12	& {1'b1,~Inst_SRAI,10'h3FF}}} 
 									| {{32{ S_Type	}}	& {{20{imm7[6]	}}	, imm7		,imm5	}}
 									| {{32{ U_Type	}}	& { U_imm , 12'd0										}}
 									| {{32{ B_Type	}}	& {{19{imm12_B[11]}}, imm12_B	,1'b0	}}
 									| {{32{ J_Type	}}	& {{11{imm20[19]}}	, imm20		,1'b0	}};
 
-	assign GRF_Wen	= R_Type		|U_Type			|J_Type			|Inst_ADDI
-									| Inst_SLTI	|Inst_SLTIU |Inst_XORI	|Inst_ORI
-									| Inst_ANDI |Inst_SLLI	|Inst_SRLI	|Inst_SRAI 
-									| Inst_JALR	;
+	assign GRF_Wen	= R_Type		|U_Type			|J_Type			|I_Type;
 
 	assign ALUControl	= {
 							ADD	,

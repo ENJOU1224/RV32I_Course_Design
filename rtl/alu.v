@@ -117,17 +117,17 @@ module alu(
 	// SLL
 	wire [31:0] SLLResult;
 
-	assign SLLResult	= i_ALUOperand1_32 << i_ALUOperand2_32;
+	assign SLLResult	= i_ALUOperand1_32 << i_ALUOperand2_32[4:0];
 
 	// SRL
 	wire [31:0] SRLResult;
 
-	assign SRLResult	= i_ALUOperand1_32 >> i_ALUOperand2_32;
+	assign SRLResult	= i_ALUOperand1_32 >> i_ALUOperand2_32[4:0];
 
 	// SRA
 	wire [31:0] SRAResult;
 
-	assign SRAResult	= ($signed(i_ALUOperand1_32)) >>> i_ALUOperand2_32;
+	assign SRAResult	= ($signed(i_ALUOperand1_32)) >>> i_ALUOperand2_32[4:0];
 
 	// LUI
 	wire [31:0] LUIResult;

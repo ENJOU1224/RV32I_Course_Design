@@ -102,13 +102,12 @@ wire [31:0] GRFWriteData;
 );
 
 (* keep_hierarchy = "yes" *)dist_mem_gen_0 DRam (
-  .a(ALUResult[11:2]),      // input wire [9 : 0] a
+  .a(ALUResult[13:2]),      // input wire [11 : 0] a
   .d(MemoryStoreData),      // input wire [31 : 0] d
   .clk(clk),  // input wire clk
   .we(MemoryWriteEnable),    // input wire we
   .spo(MemoryLoadData)  // output wire [31 : 0] spo
 );
-
 (* keep_hierarchy = "yes" *)regfile regfile(
 		.clk				(clk			),				// 时钟信号 
 		.rstn				(rstn			),				// 复位信号
