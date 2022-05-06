@@ -10,6 +10,7 @@
 */
 module alu(
 	input  [31:0]	PC,
+	input  [31:0] i_PCPlus4_32,
 
 	// 来自DECODE部分的信号					(Signals from DECODE Part)	
 	input  [11:0]	i_ALUControl_12,
@@ -18,7 +19,6 @@ module alu(
 
 	// 输出到NextPC部分						(Output to NextPC Part)	
 	output [31:0]	o_JumpBranchAddr_32,
-	output [31:0]	o_PCPlus4_32,
 
 	// 输出到Memory部分						(Output to Memory Part)
 	output [31:0]	o_ALUResult_32
@@ -26,8 +26,8 @@ module alu(
 
 //--------------------控制信号拆分(Control Signal Splitting)--------------------//
 	wire	ADD , PC4	, SUB	, SLT	,
-			SLTU, AND	, OR	, XOR	,
-			SLL	, SRL	, SRA	, LUI	;
+				SLTU, AND	, OR	, XOR	,
+				SLL	, SRL	, SRA	, LUI	;
 
 	assign {
 			ADD ,
@@ -54,18 +54,18 @@ module alu(
 							| {32{~SUB}} &  i_ALUOperand2_32;
 	
 	// assign AddSubResult		= i_ALUOperand1_32 + AdderOperand2 +SUB;
-	 Adder Adder(
+	 adder32 adder(
 	         .i_adderOperand1_32		(i_ALUOperand1_32	),
 	         .i_adderOperand2_32		(AdderOperand2		),
-	         .i_cIn_1			        (SUB				),
-	         .o_adderSum_32			    (AddSubResult		),
-	         .o_cOut_1			        (			        )
+	         .i_cIn_1								(SUB							),
+	         .o_adderSum_32			    (AddSubResult			),
+	         .o_cOut_1			        (									)
 	 );
 
 	// PC+4
 	wire [31:0]	PC4Result;
 
-	assign PC4Result	= PC + 4;
+	assign PC4Result	= i_PCPlus4_32;
 
 	// SLT&SLTU
 	wire [31:0] SLTResult;

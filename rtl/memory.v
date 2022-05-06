@@ -14,8 +14,9 @@ module memory(
 	input [31:0]	i_MemoryLoadData_32,
 	
 	// 输出到内存的信号					(Signals output to memory)
+	output[31:0]	o_MemoryStoreAddr_32,
 	output[31:0]	o_MemoryStoreData_32,
-	output			o_MemoryWriteEnable_1,
+	output				o_MemoryWriteEnable_1,
 
 	// 输出到WB部分的信号				(Signals output to WB)
 	output[31:0]	o_GRFWriteData_32
@@ -70,6 +71,8 @@ assign o_MemoryStoreData_32 = DataWriteToMem;
 
 assign o_MemoryWriteEnable_1= i_Store_1;
 
-assign o_GRFWriteData_32	= DataWriteToGRF;
+assign o_GRFWriteData_32		= DataWriteToGRF;
 							
+assign o_MemoryStoreAddr_32 = {i_ALUResult_32[31:2],2'b0};
+
 endmodule

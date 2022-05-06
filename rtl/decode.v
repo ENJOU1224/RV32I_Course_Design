@@ -10,8 +10,10 @@
 `include "RVG.vh"
 
 module decode (
+	input		rstn,
+
   input   [31:0]  PC,
-  input   [31:0]  Inst,
+  input   [31:0]  i_Inst_32,
 
   // 通用寄存器连接					(General Register Connection)
   output  [ 4:0]  o_GRFReadAddr1_5,
@@ -41,6 +43,7 @@ module decode (
 	output					o_UnsignedCMP_1
 );
 
+wire [31:0] Inst = {32{rstn}} &i_Inst_32;
 //------------------------------指令区域划分(Instruction Subfield Division){begin}------------------------------//
 
     wire [ 6:0] funct7;

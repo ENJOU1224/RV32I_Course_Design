@@ -16,17 +16,17 @@ module m_adder (
 	generate
 			for(i=0; i<16;i=i+1)begin
 					m_adder4 m_in0Adder4(
-							.i_cIn_1 			(1'b0 							),
+							.i_cIn_1						(1'b0 							),
 							.i_adderOperand1_8 	(i_adderOperand1_64[7+8*i:8*i] 	),
 							.i_adderOperand2_8 	(i_adderOperand2_64[7+8*i:8*i] 	),
-							.o_cOut_1      		(w_0inCIn_16[i] 				),
-							.o_adderSum_8 		(w_0inTempSum_4[i] 				)
+							.o_cOut_1						(w_0inCIn_16[i] 				),
+							.o_adderSum_8				(w_0inTempSum_4[i] 				)
 					);
 					m_adder4 m_in1Adder4(
-							.i_cIn_1 			(1'b1 							),
+							.i_cIn_1						(1'b1 							),
 							.i_adderOperand1_8 	(i_adderOperand1_64[7+8*i:8*i] 	),
 							.i_adderOperand2_8 	(i_adderOperand2_64[7+8*i:8*i] 	),
-							.o_cOut_1      		(w_1inCIn_16[i] 				),
+							.o_cOut_1						(w_1inCIn_16[i] 				),
 							.o_adderSum_8      	(w_1inTempSum_4[i] 				)
 					);
 			end
@@ -41,7 +41,7 @@ module m_adder (
 				end else begin
 					w_cIn_16[j] 		 = w_cIn_16[j-1] ? w_1inCIn_16[j] : w_0inCIn_16[j];
 				end
-				w_tempSum_4[j]			= w_cIn_16[j] ? w_1inTempSum_4[j] : w_0inTempSum_4[j];
+					w_tempSum_4[j]			= w_cIn_16[j] ? w_1inTempSum_4[j] : w_0inTempSum_4[j];
 			end
 	end
 
