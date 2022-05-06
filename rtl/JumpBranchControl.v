@@ -14,7 +14,7 @@ module JumpBranchControl(
 									| ~GreaterOrEqual	& |i_JumpCode_8[3:2]						// blt
 									|  GreaterOrEqual	& |i_JumpCode_8[1:0]				;		// bge
 
-	assign Equal				= ~| (i_CompareSrc1_32 ^ i_CompareSrc2_32);
+	assign Equal	= ~| (i_CompareSrc1_32 ^ i_CompareSrc2_32);
 
 	Comparator_32bit Comparator(
 			.m				(i_CompareSrc1_32	),

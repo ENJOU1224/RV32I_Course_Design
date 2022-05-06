@@ -10,14 +10,14 @@
 `include "RVG.vh"
 
 module decode (
-    input   [31:0]  PC,
-    input   [31:0]  Inst,
+  input   [31:0]  PC,
+  input   [31:0]  Inst,
 
-    // 通用寄存器连接					(General Register Connection)
-    output  [ 4:0]  o_GRFReadAddr1_5,
-    output  [ 4:0]  o_GRFReadAddr2_5,
-    input   [31:0]  i_GRFReadData1_32,
-    input   [31:0]  i_GRFReadData2_32,
+  // 通用寄存器连接					(General Register Connection)
+  output  [ 4:0]  o_GRFReadAddr1_5,
+	output  [ 4:0]  o_GRFReadAddr2_5,
+	input   [31:0]  i_GRFReadData1_32,
+  input   [31:0]  i_GRFReadData2_32,
 
 	output	[ 4:0]	o_GRFWriteAddr_5,
 	output					o_GRFWen_1,
@@ -28,9 +28,9 @@ module decode (
 	output  [31:0]	o_ALUOperand2_32,
 
 	// 输出到Memory部分					(Output to Memory Part)
-	output			o_Load_1,
-	output			o_Store_1,
-	output			o_LoadUnsigned_1,
+	output					o_Load_1,
+	output					o_Store_1,
+	output					o_LoadUnsigned_1,
 	output	[ 1:0]	o_LoadStoreWidth_2,
 	output  [31:0]	o_StoreData_32,
 
@@ -38,7 +38,7 @@ module decode (
 	output	[ 7:0]	o_JumpBranchType_8,
 	output	[31:0]	o_CompareSrc1_32,
 	output	[31:0]	o_CompareSrc2_32,
-	output			o_UnsignedCMP_1
+	output					o_UnsignedCMP_1
 );
 
 //------------------------------指令区域划分(Instruction Subfield Division){begin}------------------------------//

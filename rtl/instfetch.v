@@ -26,7 +26,7 @@ reg [31:0] PC;
 wire[31:0] NextPC;
 
 assign NextPC	= {32{ i_JumpBranch_1 }}	& i_JumpBranchAddr_32
-				| {32{~i_JumpBranch_1 }}	& i_PCPlus4_32			;
+							| {32{~i_JumpBranch_1 }}	& i_PCPlus4_32			;
 
 
 always @(posedge clk or negedge rstn) begin
