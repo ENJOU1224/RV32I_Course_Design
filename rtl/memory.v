@@ -73,6 +73,6 @@ assign o_MemoryWriteEnable_1= i_Store_1;
 
 assign o_GRFWriteData_32		= DataWriteToGRF;
 							
-assign o_MemoryStoreAddr_32 = {i_ALUResult_32[31:2],2'b0};
+assign o_MemoryStoreAddr_32 = i_ALUResult_32;
 
 endmodule

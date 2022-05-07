@@ -126,6 +126,7 @@ wire				ALU_GRFWen;
 		.o_Store_1							(ALU_Store					),
 		.o_LoadUnsigned_1				(ALU_LoadUnsigned		),
 		.o_StoreData_32					(ALU_StoreData			),
+		.o_LoadStoreWidth_2			(ALU_LoadStoreWidth	),
 		.o_GRFWriteAddr_5				(ALU_GRFWriteAddr		),
 		.o_GRFWen_1							(ALU_GRFWen					),
 		
@@ -154,9 +155,10 @@ wire [31:0] ALU_ALUResult;
 );
 
 wire [31:0] MemoryLoadData;
+wire [31:0] MEM_MemoryLoadData;
 wire [31:0] MemoryStoreData;
 wire [31:0] MemoryStoreAddr;
-wire		MemoryWriteEnable;
+wire				MemoryWriteEnable;
 wire [31:0] MEM_GRFWriteData;
 
 wire [31:0] MEM_ALUResult;
@@ -196,7 +198,7 @@ wire				MEM_GRFWen;
 		.i_LoadUnsigned_1				(MEM_LoadUnsigned		),				// 无符号拓展的读指令信号
 		.i_LoadStoreWidth_2			(MEM_LoadStoreWidth	),				// 读写宽度 
 		.i_StoreData_32					(MEM_StoreData			),				// 写指令的数据 
-		.i_MemoryLoadData_32		(MemoryLoadData			),				// 从内存中读取的数据
+		.i_MemoryLoadData_32		(MEM_MemoryLoadData	),				// 从内存中读取的数据
 		.o_MemoryStoreAddr_32		(MemoryStoreAddr		),
 		.o_MemoryStoreData_32		(MemoryStoreData		),				// 写入到内存中的数据
 		.o_MemoryWriteEnable_1	(MemoryWriteEnable	),				// 内存写使能
@@ -206,10 +208,10 @@ wire				MEM_GRFWen;
 (* keep_hierarchy = "yes" *)blk_mem_gen_1 DRam (
   .clka(clk),    // input wire clka
   .wea(MemoryWriteEnable),      // input wire [0 : 0] wea
-  .addra(MemoryStoreAddr),  // input wire [11 : 0] addra
+  .addra(MemoryStoreAddr[13:2]),  // input wire [11 : 0] addra
   .dina(MemoryStoreData),    // input wire [31 : 0] dina
   .clkb(clk),    // input wire clkb
-  .addrb(ALU_ALUResult),  // input wire [11 : 0] addrb
+  .addrb(ALU_ALUResult[13:2]),  // input wire [11 : 0] addrb
   .doutb(MemoryLoadData)  // output wire [31 : 0] doutb
 );
 
@@ -219,26 +221,34 @@ wire [31:0] GRFReadData1;
 wire [31:0] GRFReadData2;
 
 (* keep_hierarchy = "yes" *)forward forward(
-	.DE_GRFReadAddr1_5					(DE_GRFReadAddr1	),
-	.DE_GRFReadAddr2_5					(DE_GRFReadAddr2	),
-	.DE_GRFReadData1_32					(DE_GRFReadData1	),
-	.DE_GRFReadData2_32					(DE_GRFReadData2	),	
+	.clk												(clk								),
+	.rstn												(rstn								),
+	.DE_GRFReadAddr1_5					(DE_GRFReadAddr1		),
+	.DE_GRFReadAddr2_5					(DE_GRFReadAddr2		),
+	.DE_GRFReadData1_32					(DE_GRFReadData1		),
+	.DE_GRFReadData2_32					(DE_GRFReadData2		),	
 
-	.ALU_GRFWriteAddr_5					(ALU_GRFWriteAddr ),
-	.ALU_GRFWen_1								(ALU_GRFWen				),
-	.ALU_Load_1									(ALU_Load					),
-	.ALU_ALUResult_32						(ALU_ALUResult		),
+	.ALU_GRFWriteAddr_5					(ALU_GRFWriteAddr		),
+	.ALU_GRFWen_1								(ALU_GRFWen					),
+	.ALU_Load_1									(ALU_Load						),
+	.ALU_ALUResult_32						(ALU_ALUResult			),
 
-	.MEM_GRFWriteAddr_5					(MEM_GRFWriteAddr ),	
-	.MEM_GRFWen_1								(MEM_GRFWen				),
-	.MEM_GRFWriteData_32				(MEM_GRFWriteData ),
+	.MEM_GRFWriteAddr_5					(MEM_GRFWriteAddr		),	
+	.MEM_GRFWen_1								(MEM_GRFWen					),
+	.MEM_GRFWriteData_32				(MEM_GRFWriteData		),
+	.MemoryWriteEnable_1				(MemoryWriteEnable	),
+	.MemoryStoreAddr_32					(MemoryStoreAddr		),
 	
-	.GRFReadAddr1_5							(GRFReadAddr1			),
-	.GRFReadAddr2_5							(GRFReadAddr2			),
-	.GRFReadData1_32						(GRFReadData1			),
-	.GRFReadData2_32						(GRFReadData2			),
+	.GRFReadAddr1_5							(GRFReadAddr1				),
+	.GRFReadAddr2_5							(GRFReadAddr2				),
+	.GRFReadData1_32						(GRFReadData1				),
+	.GRFReadData2_32						(GRFReadData2				),
 
-	.WaitLoad_1									(WaitLoad					)
+	.MemoryLoadData_32					(MemoryLoadData			),
+	.MemoryStoreData_32					(MemoryStoreData		),
+	.MEM_MemoryLoadData_32			(MEM_MemoryLoadData	),
+
+	.WaitLoad_1									(WaitLoad						)
 );
 (* keep_hierarchy = "yes" *)regfile regfile(
 	.clk						(clk							),				// 时钟信号 
