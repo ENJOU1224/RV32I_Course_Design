@@ -1,5 +1,52 @@
-# 暂存一下作业
+# RV32I课程设计
+实现了除了fence,PAUSE,ECALL,EBREAK以外的RV32I指令。通过了RISC-V TEST测试。
+分为instfetch,decode,alu,memory四个流水级。(其实instfetch不太算一个单独流水级，严格来说算三个。)不严谨是四个流水级，严谨就三个流水级。
 
+## instfetch
+instfetch部分只做了下一迭代PC生成,有三种情况。
+
+* PC+4(正常进行)
+* PC(暂停流水)decode级确认遇到跳转 或者 decode出现了对Load结果的依赖
+* JumpBranchAddr(跳转地址),出现分支跳转
+
+输出NextPC分别送到在instfetch和decode之间的PC寄存器以及InstROM。PC寄存器是用以配合同步读写的InstROM来使得PC指示的就是当前Inst的。
+
+## decode 
+
+这一级有俩组件，decode以及JumpBranchControl。
+
+### decode
+
+实现了指令译码，分为下列几层
+
+* 指令区域划分
+* 指令译码
+* 指令分类(按指令结构类型，指令对应ALU操作，指令对应memory操作，指令操作数类型等)
+* 处理整合生成输出信号
+
+最开始额外加上的rstn和inst的与是为了避免JumpBranchControl中相关标志初始不定态导致instfetch工作不正常。
+
+### JumpBranchControl
+
+实现了分支跳转的判断，调用了一个32位比较器完成上述工作。从decode输入了分支跳转类型用于结合判断。最终输出分支跳转是否发生。在流水线版本中，只有分支跳转指令运行到alu部分才开始跳转，原因是使用了alu来计算分支跳转目的地址。
+
+## alu
+
+就是alu，没啥特别的，实现了一个并行前缀加法器，其他都是直接调用。有机会替换成手写的算法。对了，为了保证load的性能，读取地址是由alu发出的，使用的是简化的双端口ram，一读一写。
+
+## memory
+
+处理loadstore指令以及他们的数据，送入grf中。没啥特别的。
+
+## grf
+
+通用寄存器，异步读同步写。
+
+## forward
+
+前递模块。处理了decode以来alu结果前递，decode依赖memory结果前递。alu的load是当前mem的store的暂存。处理了decode依赖load结果的暂停。
+
+# 开发记录(只有几个节点)
 RT,但是后续的CPU可能也会基于这个作业
 
 2022.3.24 16:03:39 完成了decode和开始动工ALU，目前单周期，故计划在ALU里完成PC+4，后续计划PC+4向后传输来减轻取消后续单独计算PC+4模块，然后把加法器用去计算跳转地址输出。还单独做了分支跳转模块，里面带了比较器和相等判断器件来服务分支语句是否执行。
