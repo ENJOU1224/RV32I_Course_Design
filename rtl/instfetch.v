@@ -13,18 +13,26 @@ module instfetch(
 	 output[31:0]	o_NextPC_32,
 
 	// 输出到后续的信号
-	output [31:0] o_PCPlus4_32
+	output [31:0] o_PCPlus4_32,
+
+	input					i_WaitLoad_1
 );
 
 
 wire[31:0] NextPC;
 wire[31:0] PCPlus4;
 
+wire JumpBranch = i_JumpBranchInDE_1 & i_JumpBranchInALU_1 & ~i_WaitLoad_1;
+
+wire Wait = i_JumpBranchInDE_1 & ~i_JumpBranchInALU_1 | i_WaitLoad_1;
+
+wire GoOn = ~i_JumpBranchInDE_1 & ~i_WaitLoad_1;
+
 assign PCPlus4 = i_PC_32 + 4;
 
-assign NextPC	= {32{ i_JumpBranchInDE_1 &	 i_JumpBranchInALU_1 }}	& i_JumpBranchAddr_32
-							| {32{ i_JumpBranchInDE_1 & ~i_JumpBranchInALU_1 }}	& i_PC_32			
-							| {32{~i_JumpBranchInDE_1 & ~i_JumpBranchInALU_1 }}	& PCPlus4			;
+assign NextPC	= {32{ JumpBranch }}	& i_JumpBranchAddr_32
+							| {32{ Wait				}}	& i_PC_32			
+							| {32{ GoOn				}}	& PCPlus4			;
 
 assign o_NextPC_32		= NextPC;
 assign o_PCPlus4_32		= PCPlus4;

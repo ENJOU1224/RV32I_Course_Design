@@ -7,6 +7,7 @@ wire [31:0]		PCPlus4;
 wire [31:0]		JumpBranchAddr;
 wire					JumpBranchInDE;
 wire					JumpBranchInALU;
+wire					WaitLoad;
 wire [31:0]		DEPC;
 wire [31:0]		NextPC;
 wire [31:0]		Inst;
@@ -15,7 +16,8 @@ wire [31:0]		Inst;
 		.i_JumpBranchAddr_32	(JumpBranchAddr		),		// 分支跳转的目的地址
 		.i_JumpBranchInDE_1		(JumpBranchInDE		),		// 目前Decode中指令触发分支跳转
 		.i_JumpBranchInALU_1	(JumpBranchInALU	),		// 目前ALU中指令触发分支跳转
-		.i_PC_32							(DEPC								),		// 已发射指令PC
+		.i_WaitLoad_1					(WaitLoad					),
+		.i_PC_32							(DEPC							),		// 已发射指令PC
 		.o_NextPC_32					(NextPC						),		// 待发射指令PC
 		.o_PCPlus4_32					(PCPlus4					)			// PC+4,分支跳转用
 );
@@ -37,10 +39,10 @@ wire [31:0] DEPCPlus4;
   .douta(Inst)  // output wire [31 : 0] douta
 );
 
-wire [ 4:0] GRFReadAddr1;
-wire [ 4:0] GRFReadAddr2;
-wire [31:0] GRFReadData1;
-wire [31:0] GRFReadData2;
+wire [ 4:0] DE_GRFReadAddr1;
+wire [ 4:0] DE_GRFReadAddr2;
+wire [31:0] DE_GRFReadData1;
+wire [31:0] DE_GRFReadData2;
 wire [ 4:0] DE_GRFWriteAddr;
 wire				DE_GRFWen;
 wire [11:0] DE_ALUControl;
@@ -60,10 +62,10 @@ wire				UnsignedCMP;
 		.rstn								(rstn							),
 		.PC									(DEPC							),				// 当前指令PC
 		.i_Inst_32					(Inst							),				// 当前指令
-		.o_GRFReadAddr1_5		(GRFReadAddr1			),				// 通用寄存器读接口1的地址
-		.o_GRFReadAddr2_5		(GRFReadAddr2			),				// 通用寄存器读接口2的地址
-		.i_GRFReadData1_32	(GRFReadData1			),				// 通用寄存器读接口1的数据
-		.i_GRFReadData2_32	(GRFReadData2			),				// 通用寄存器读接口2的数据
+		.o_GRFReadAddr1_5		(DE_GRFReadAddr1	),				// 通用寄存器读接口1的地址
+		.o_GRFReadAddr2_5		(DE_GRFReadAddr2	),				// 通用寄存器读接口2的地址
+		.i_GRFReadData1_32	(DE_GRFReadData1	),				// 通用寄存器读接口1的数据
+		.i_GRFReadData2_32	(DE_GRFReadData2	),				// 通用寄存器读接口2的数据
 		.o_GRFWriteAddr_5		(DE_GRFWriteAddr	),				// 通用寄存器写接口地址
 		.o_GRFWen_1					(DE_GRFWen				),				// 通用寄存器写使能信号
 		.o_ALUControl_12		(DE_ALUControl		),				// ALU控制信号
@@ -153,9 +155,9 @@ wire [31:0] ALU_ALUResult;
 
 wire [31:0] MemoryLoadData;
 wire [31:0] MemoryStoreData;
-wire [31:0] MemoryAddr;
+wire [31:0] MemoryStoreAddr;
 wire		MemoryWriteEnable;
-wire [31:0] GRFWriteData;
+wire [31:0] MEM_GRFWriteData;
 
 wire [31:0] MEM_ALUResult;
 wire				MEM_Load;
@@ -164,8 +166,8 @@ wire				MEM_LoadUnsigned;
 wire [ 1:0] MEM_LoadStoreWidth;
 wire [31:0] MEM_StoreData;
 wire [31:0] MEM_StoreAddr;
-wire [ 4:0] GRFWriteAddr;
-wire				GRFWen;
+wire [ 4:0] MEM_GRFWriteAddr;
+wire				MEM_GRFWen;
 
 (* keep_hierarchy = "yes" *)ALUtoMEM_REG ALUtoMEM_REG(
 		.clk								(clk								),
@@ -184,8 +186,8 @@ wire				GRFWen;
 		.o_LoadUnsigned_1		(MEM_LoadUnsigned		),
 		.o_LoadStoreWidth_2 (MEM_LoadStoreWidth ),
 		.o_StoreData_32			(MEM_StoreData			),
-		.o_GRFWriteAddr_5		(GRFWriteAddr				),
-		.o_GRFWen_1					(GRFWen							)
+		.o_GRFWriteAddr_5		(MEM_GRFWriteAddr		),
+		.o_GRFWen_1					(MEM_GRFWen					)
 );
 (* keep_hierarchy = "yes" *)memory memory(
 		.i_ALUResult_32					(MEM_ALUResult			),				// ALU计算结果
@@ -195,31 +197,59 @@ wire				GRFWen;
 		.i_LoadStoreWidth_2			(MEM_LoadStoreWidth	),				// 读写宽度 
 		.i_StoreData_32					(MEM_StoreData			),				// 写指令的数据 
 		.i_MemoryLoadData_32		(MemoryLoadData			),				// 从内存中读取的数据
-		.o_MemoryStoreAddr_32		(MEM_StoreAddr			),
+		.o_MemoryStoreAddr_32		(MemoryStoreAddr		),
 		.o_MemoryStoreData_32		(MemoryStoreData		),				// 写入到内存中的数据
 		.o_MemoryWriteEnable_1	(MemoryWriteEnable	),				// 内存写使能
-		.o_GRFWriteData_32			(GRFWriteData				)					// 写入到通用寄存器的数据
+		.o_GRFWriteData_32			(MEM_GRFWriteData		)					// 写入到通用寄存器的数据
 );
 
 (* keep_hierarchy = "yes" *)blk_mem_gen_1 DRam (
   .clka(clk),    // input wire clka
-  .wea(wea),      // input wire [0 : 0] wea
+  .wea(MemoryWriteEnable),      // input wire [0 : 0] wea
   .addra(MemoryStoreAddr),  // input wire [11 : 0] addra
   .dina(MemoryStoreData),    // input wire [31 : 0] dina
   .clkb(clk),    // input wire clkb
   .addrb(ALU_ALUResult),  // input wire [11 : 0] addrb
   .doutb(MemoryLoadData)  // output wire [31 : 0] doutb
 );
+
+wire [ 4:0] GRFReadAddr1;
+wire [ 4:0] GRFReadAddr2;
+wire [31:0] GRFReadData1;
+wire [31:0] GRFReadData2;
+
+(* keep_hierarchy = "yes" *)forward forward(
+	.DE_GRFReadAddr1_5					(DE_GRFReadAddr1	),
+	.DE_GRFReadAddr2_5					(DE_GRFReadAddr2	),
+	.DE_GRFReadData1_32					(DE_GRFReadData1	),
+	.DE_GRFReadData2_32					(DE_GRFReadData2	),	
+
+	.ALU_GRFWriteAddr_5					(ALU_GRFWriteAddr ),
+	.ALU_GRFWen_1								(ALU_GRFWen				),
+	.ALU_Load_1									(ALU_Load					),
+	.ALU_ALUResult_32						(ALU_ALUResult		),
+
+	.MEM_GRFWriteAddr_5					(MEM_GRFWriteAddr ),	
+	.MEM_GRFWen_1								(MEM_GRFWen				),
+	.MEM_GRFWriteData_32				(MEM_GRFWriteData ),
+	
+	.GRFReadAddr1_5							(GRFReadAddr1			),
+	.GRFReadAddr2_5							(GRFReadAddr2			),
+	.GRFReadData1_32						(GRFReadData1			),
+	.GRFReadData2_32						(GRFReadData2			),
+
+	.WaitLoad_1									(WaitLoad					)
+);
 (* keep_hierarchy = "yes" *)regfile regfile(
-		.clk						(clk					),				// 时钟信号 
-		.rstn						(rstn					),				// 复位信号
-		.i_wen					(GRFWen				),				// 通用寄存器写使能信号
-		.i_waddr_5			(GRFWriteAddr	),				// 通用寄存器写接口地址
-		.i_wdata_32			(GRFWriteData	),				// 通用寄存器写数据
-		.i_raddr1_5			(GRFReadAddr1	),				// 通用寄存器读接口1的地址
-		.i_raddr2_5			(GRFReadAddr2	),				// 通用寄存器读接口2的地址
-		.o_rdata1_32		(GRFReadData1	),				// 通用寄存器读接口1的数据
-		.o_rdata2_32		(GRFReadData2	)					// 通用寄存器读接口2的数据
+	.clk						(clk							),				// 时钟信号 
+	.rstn						(rstn							),				// 复位信号
+	.i_wen					(MEM_GRFWen				),				// 通用寄存器写使能信号
+	.i_waddr_5			(MEM_GRFWriteAddr	),				// 通用寄存器写接口地址
+	.i_wdata_32			(MEM_GRFWriteData	),				// 通用寄存器写数据
+	.i_raddr1_5			(GRFReadAddr1			),				// 通用寄存器读接口1的地址
+	.i_raddr2_5			(GRFReadAddr2			),				// 通用寄存器读接口2的地址
+	.o_rdata1_32		(GRFReadData1			),				// 通用寄存器读接口1的数据
+	.o_rdata2_32		(GRFReadData2			)					// 通用寄存器读接口2的数据
 );
 
 endmodule
