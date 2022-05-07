@@ -1,5 +1,6 @@
 # RV32I课程设计
 实现了除了fence,PAUSE,ECALL,EBREAK以外的RV32I指令。通过了RISC-V TEST测试。
+
 分为instfetch,decode,alu,memory四个流水级。(其实instfetch不太算一个单独流水级，严格来说算三个。)不严谨是四个流水级，严谨就三个流水级。
 
 ## instfetch
