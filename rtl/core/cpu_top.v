@@ -12,7 +12,7 @@ wire [31:0]		DEPC;
 wire [31:0]		NextPC;
 wire [31:0]		Inst;
 
-(* keep_hierarchy = "yes" *)instfetch instfetch(
+(* DONT_TOUCH= "TRUE" *)instfetch instfetch(
 		.i_JumpBranchAddr_32	(JumpBranchAddr		),		// 分支跳转的目的地址
 		.i_JumpBranchInDE_1		(JumpBranchInDE		),		// 目前Decode中指令触发分支跳转
 		.i_JumpBranchInALU_1	(JumpBranchInALU	),		// 目前ALU中指令触发分支跳转
@@ -24,7 +24,7 @@ wire [31:0]		Inst;
 
 wire [31:0] DEPCPlus4;
 
-(* keep_hierarchy = "yes" *)IFtoDE_REG IFtoDE_REG(
+(* DONT_TOUCH= "TRUE" *)IFtoDE_REG IFtoDE_REG(
 		.clk									(clk						),
 		.rstn									(rstn						),
 		.i_NextPC_32					(NextPC					),
@@ -33,10 +33,10 @@ wire [31:0] DEPCPlus4;
 		.o_PC_32							(DEPC						)
 );
 
-(* keep_hierarchy = "yes" *)blk_mem_gen_0 IRom (
-  .clka(clk),    // input wire clka
-  .addra(NextPC),  // input wire [31 : 0] addra
-  .douta(Inst)  // output wire [31 : 0] douta
+ (* DONT_TOUCH= "TRUE" *)blk_mem_gen_0 IRom (
+  .clka			(clk		),    // input wire clka
+  .addra		(NextPC	),		// input wire [31 : 0] addra
+  .douta		(Inst		)			// output wire [31 : 0] douta
 );
 
 wire [ 4:0] DE_GRFReadAddr1;
@@ -58,7 +58,7 @@ wire [31:0] CompareSrc1;
 wire [31:0] CompareSrc2;
 wire				UnsignedCMP;
 
-(* keep_hierarchy = "yes" *)decode decode(
+ (* DONT_TOUCH= "TRUE" *)decode decode(
 		.rstn								(rstn							),
 		.PC									(DEPC							),				// 当前指令PC
 		.i_Inst_32					(Inst							),				// 当前指令
@@ -98,7 +98,7 @@ wire [31:0] ALU_StoreData;
 wire [ 4:0] ALU_GRFWriteAddr;
 wire				ALU_GRFWen;
 
-(* keep_hierarchy = "yes" *)DEtoALU_REG DEtoALU_REG(
+ (* DONT_TOUCH= "TRUE" *)DEtoALU_REG DEtoALU_REG(
 		.clk										(clk								),
 		.rstn										(rstn								),
 		.i_DecodePC_32					(DEPC								),
@@ -136,7 +136,7 @@ wire				ALU_GRFWen;
 
 wire [31:0] ALU_ALUResult;
 
-(* keep_hierarchy = "yes" *)alu alu(
+ (* DONT_TOUCH= "TRUE" *)alu alu(
 		.PC									(ALUPC					),				// 当前指令PC
 		.i_PCPlus4_32				(ALUPCPlus4			),
 		.i_ALUControl_12		(ALU_ALUControl	),				// ALU控制信号
@@ -146,7 +146,7 @@ wire [31:0] ALU_ALUResult;
 		.o_ALUResult_32			(ALU_ALUResult	)					// ALU计算结果
 );
 
-(* keep_hierarchy = "yes" *)JumpBranchControl JumpBranchControl(
+(* DONT_TOUCH= "TRUE" *)JumpBranchControl JumpBranchControl(
 		.i_UnsignedCMP_1	(UnsignedCMP		),				// 无符号比较
 		.i_JumpCode_8			(JumpBranchType ),				// 分支跳转类型
 		.i_CompareSrc1_32	(CompareSrc1		),				// 分支类型比较操作数1
@@ -171,7 +171,7 @@ wire [31:0] MEM_StoreAddr;
 wire [ 4:0] MEM_GRFWriteAddr;
 wire				MEM_GRFWen;
 
-(* keep_hierarchy = "yes" *)ALUtoMEM_REG ALUtoMEM_REG(
+ (* DONT_TOUCH= "TRUE" *)ALUtoMEM_REG ALUtoMEM_REG(
 		.clk								(clk								),
 		.rstn								(rstn								),
 		.i_ALUResult_32			(ALU_ALUResult			),
@@ -191,7 +191,7 @@ wire				MEM_GRFWen;
 		.o_GRFWriteAddr_5		(MEM_GRFWriteAddr		),
 		.o_GRFWen_1					(MEM_GRFWen					)
 );
-(* keep_hierarchy = "yes" *)memory memory(
+ (* DONT_TOUCH= "TRUE" *)memory memory(
 		.i_ALUResult_32					(MEM_ALUResult			),				// ALU计算结果
 		.i_Load_1								(MEM_Load						),				// 读指令信号
 		.i_Store_1							(MEM_Store					),				// 写指令信号
@@ -205,14 +205,14 @@ wire				MEM_GRFWen;
 		.o_GRFWriteData_32			(MEM_GRFWriteData		)					// 写入到通用寄存器的数据
 );
 
-(* keep_hierarchy = "yes" *)blk_mem_gen_1 DRam (
-  .clka(clk),    // input wire clka
-  .wea(MemoryWriteEnable),      // input wire [0 : 0] wea
-  .addra(MemoryStoreAddr[13:2]),  // input wire [11 : 0] addra
-  .dina(MemoryStoreData),    // input wire [31 : 0] dina
-  .clkb(clk),    // input wire clkb
-  .addrb(ALU_ALUResult[13:2]),  // input wire [11 : 0] addrb
-  .doutb(MemoryLoadData)  // output wire [31 : 0] doutb
+ (* DONT_TOUCH= "TRUE" *)blk_mem_gen_1 DRam (
+  .clka				(clk									),			// input wire clka
+  .wea				(MemoryWriteEnable		),      // input wire [0 : 0] wea
+  .addra			(MemoryStoreAddr[13:2]),			// input wire [11 : 0] addra
+  .dina				(MemoryStoreData			),			// input wire [31 : 0] dina
+  .clkb				(clk									),			// input wire clkb
+  .addrb			(ALU_ALUResult[13:2]	),			// input wire [11 : 0] addrb
+  .doutb			(MemoryLoadData				)				// output wire [31 : 0] doutb
 );
 
 wire [ 4:0] GRFReadAddr1;
@@ -220,7 +220,7 @@ wire [ 4:0] GRFReadAddr2;
 wire [31:0] GRFReadData1;
 wire [31:0] GRFReadData2;
 
-(* keep_hierarchy = "yes" *)forward forward(
+ (* DONT_TOUCH= "TRUE" *)forward forward(
 	.clk												(clk								),
 	.rstn												(rstn								),
 	.DE_GRFReadAddr1_5					(DE_GRFReadAddr1		),
@@ -250,7 +250,7 @@ wire [31:0] GRFReadData2;
 
 	.WaitLoad_1									(WaitLoad						)
 );
-(* keep_hierarchy = "yes" *)regfile regfile(
+ (* DONT_TOUCH= "TRUE" *)regfile regfile(
 	.clk						(clk							),				// 时钟信号 
 	.rstn						(rstn							),				// 复位信号
 	.i_wen					(MEM_GRFWen				),				// 通用寄存器写使能信号
