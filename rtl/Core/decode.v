@@ -44,6 +44,7 @@ module decode (
 );
 
 wire [31:0] Inst = {32{rstn}} &i_Inst_32;
+
 //------------------------------指令区域划分(Instruction Subfield Division){begin}------------------------------//
 
     wire [ 6:0] funct7;
