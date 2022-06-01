@@ -9,7 +9,7 @@
 */
 
 module cache (
-    input clk,  // 时钟信号
+		input clk,  // 时钟信号
     input rstn, // 复位信号
 
     // Cache 与 CPU流水线 的交互接口
